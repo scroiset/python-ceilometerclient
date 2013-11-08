@@ -14,8 +14,10 @@
 from ceilometerclient.common import base
 from ceilometerclient.v2 import options
 
+import warnings
+
 CREATION_ATTRIBUTES = ('source',
-                       'counter_name',
+                       'meter_name',
                        'counter_type',
                        'counter_unit',
                        'counter_volume',
@@ -35,18 +37,24 @@ class SampleManager(base.Manager):
     resource_class = Sample
 
     @staticmethod
-    def _path(counter_name=None):
-        return '/v2/meters/%s' % counter_name if counter_name else '/v2/meters'
+    def _path(meter_name=None):
+        return '/v2/meters/%s' % meter_name if meter_name else '/v2/meters'
 
     def list(self, meter_name=None, q=None, limit=None):
-        path = self._path(counter_name=meter_name)
+        path = self._path(meter_name=meter_name)
         params = ['limit=%s' % str(limit)] if limit else None
         return self._list(options.build_url(path, q, params))
 
     def create(self, **kwargs):
         new = dict((key, value) for (key, value) in kwargs.items()
                    if key in CREATION_ATTRIBUTES)
-        url = self._path(counter_name=kwargs['counter_name'])
+
+        if 'counter_name' in kwargs:
+            warnings.warn('counter_name has been renamed to meter_name',
+                          DeprecationWarning)
+            kwargs['meter_name'] = kwargs['counter_name']
+
+        url = self._path(meter_name=kwargs['meter_name'])
         resp, body = self.api.json_request('POST',
                                            url,
                                            body=[new])

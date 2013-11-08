@@ -18,7 +18,7 @@ import copy
 from ceilometerclient.tests import utils
 import ceilometerclient.v2.samples
 
-GET_SAMPLE = {u'counter_name': u'instance',
+GET_SAMPLE = {u'meter_name': u'instance',
               u'user_id': u'user-id',
               u'resource_id': u'resource-id',
               u'timestamp': u'2012-07-02T10:40:00',
